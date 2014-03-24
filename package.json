@@ -1,0 +1,36 @@
+{
+  "name": "generator-response",
+  "version": "0.1.0",
+  "description": "Yeoman generator",
+  "license": "MIT",
+  "main": "app/index.js",
+  "repository": "drbroad/generator-response",
+  "homepage": "http://thepowertoprovoke.com",      
+  "author": {
+    "name": "Marc Broad",
+    "email": "mbroad@thepowertoprovoke.com",
+    "url": "https://github.com/drbroad"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "files": [
+    "app"
+  ],
+  "keywords": [
+    "yeoman-generator"
+  ],
+  "dependencies": {
+    "yeoman-generator": "~0.16.0",
+    "chalk": "~0.4.0"
+  },
+  "devDependencies": {
+    "mocha": "*"
+  },
+  "peerDependencies": {
+    "yo": ">=1.0.0"
+  }
+}
