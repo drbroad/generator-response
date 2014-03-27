@@ -32,3 +32,7 @@ Lots of things need to be added:
   - Sub-Generators, Sub-Generators, Sub-Generators...
   - Convert Sub-Generator callbacks to promises
   - Tidy the console logging
+  - Remove conditionals from bower.json, instead use iterations and install with --save-dev
+  - add gulp to dependencies
+  - build out gulpfiles
+  - tidy up WP install

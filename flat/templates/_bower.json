@@ -1,0 +1,16 @@
+{
+	"name": "<%= _.slugify(jobName) %>",
+	"private": true,
+	"author": "<%= author %> <<%= authorEmail %>>",
+	"version": "0.1.0",
+	"dependencies": {
+		"jquery" 	: 	"<%= jqueryVersion %>",
+		"bootstrap"	:	 "~3.0.3",
+		"modernizr" 	:	 "",
+	<% if ( IE8 ){ %>
+		"respond"	:	 "~1.4.2",
+	<% } %>
+		"Font-Awesome": 	""
+	}
+}
+

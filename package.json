@@ -25,10 +25,19 @@
   ],
   "dependencies": {
     "yeoman-generator": "~0.16.0",
-    "chalk": "~0.4.0"
+    "chalk": "~0.4.0",
+    "rimraf": "~2.1.4",
+    "underscore": "~1.5.1",
+    "underscore-contrib": "http://github.com/documentcloud/underscore-contrib/tarball/master",
+    "q": "~0.9.7",
+    "wrench": "~1.4.4",
+    "mysql": "~2.0.0-alpha7",
+    "simple-git": "~0.2.0",
+    "mkdirp": "~0.3.5",
+    "wp-util": "~0.1.2"        
   },
   "devDependencies": {
-    "mocha": "*"
+    "mocha": "*"    
   },
   "peerDependencies": {
     "yo": ">=1.0.0"
