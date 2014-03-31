@@ -16,7 +16,7 @@ var _TYPE_EMAIL		= 'Email Campaign';
  */
 
 // var config =	[
-					
+
 // 					_TYPE_LARAVEL = {
 
 // 					},
@@ -77,7 +77,7 @@ var ResponseGenerator = yeoman.generators.Base.extend({
 
 
 
-		
+
 		this.on('end', function () {
 			this.installDependencies({
 				bower: true,
@@ -107,14 +107,14 @@ var ResponseGenerator = yeoman.generators.Base.extend({
 			chalk.red("\n                   |_|                              ");
 
 		//console.log(welcome);
-		
+
 
 	},
 
 	askFor: function () {
 		var done = this.async();
 
-		console.log(chalk.cyan('You\'re using the fantastic RespLaravel generator.')); 
+		console.log(chalk.cyan('You\'re using the fantastic RespLaravel generator.'));
 		console.log(chalk.magenta('Response:  Scaffold your latest project.'));
 
 		var prompts = [
@@ -124,8 +124,8 @@ var ResponseGenerator = yeoman.generators.Base.extend({
 				message: "What kind of project would you like to generate?",
 				choices: [
 						{
-							name: "Laravel",	
-							value: _TYPE_LARAVEL	
+							name: "Laravel",
+							value: _TYPE_LARAVEL
 						},{
 							name: "HTML Flatfile",
 							value: _TYPE_FLAT
@@ -143,12 +143,10 @@ var ResponseGenerator = yeoman.generators.Base.extend({
 				name: "appName",
 				message: "What would you like to call this project?",
 				default: "Playground"
-			}			
+			}
 		];
 
 		this.prompt(prompts, function (props) {
-			console.log(chalk.yellow('PUSHING PROPS...'));
-
 			this.options = props;
 
 			// this.jobName = props.jobName;
@@ -170,7 +168,7 @@ var ResponseGenerator = yeoman.generators.Base.extend({
 
 	clean: function () {
 		var done = this.async();
-		this.invoke('response:clean', { args: [this.appName], options: this.options }, done);									
+		this.invoke('response:clean', { args: [this.appName], options: this.options }, done);
 	},
 
 	app: function () {
@@ -197,7 +195,7 @@ var ResponseGenerator = yeoman.generators.Base.extend({
 		}
 
 		this.invoke(subGenerator, { args: [ this.appName ], options: this.options }, done);
-		//done();												
+		//done();
 	},
 
 	projectfiles: function () {

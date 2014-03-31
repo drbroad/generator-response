@@ -3,9 +3,22 @@ var util = require('util');
 var path = require('path');
 var yeoman = require('yeoman-generator');
 var chalk = require('chalk');
+var prompts = require('../util/prompts');
+var Logger = require('../util/logger');
+var Config = require('../util/config');
 
 var FlatfileGenerator = yeoman.generators.Base.extend({
 	init: function () {
+
+		// Setup the logger
+		this.logger = new Logger({
+			level: this.options.log
+		});
+
+		// Load the config files
+		this.conf = new Config();
+
+		this.pkg = yeoman.file.readJSON(path.join(__dirname, '../package.json'));
 
 		this.on('end', function () {
 			// this.installDependencies({
@@ -22,7 +35,23 @@ var FlatfileGenerator = yeoman.generators.Base.extend({
 		// Now you can bind to the dependencies installed event
 		this.on('dependenciesInstalled', function() {
 			this.spawnCommand('grunt');
-		});			
+		});
+	},
+
+	commonPrompts: function () {
+		var done = this.async();
+		var me = this;
+		console.log(chalk.magenta('Response:  Opts'));
+
+		var setOpts = function () {
+		console.log(chalk.magenta('Response:  setOpts'));
+
+			me.prompt(prompts(me.options.advanced, me.conf.get()), function(input) {
+				done();
+			});
+		}
+
+		setOpts();
 	},
 
 	askFor: function () {
@@ -69,7 +98,7 @@ var FlatfileGenerator = yeoman.generators.Base.extend({
 				this.jqueryVersion = "1.9.0";
 			}
 
-		 	done();
+			done();
 		}.bind(this));
 	},
 

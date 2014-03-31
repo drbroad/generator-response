@@ -14,7 +14,7 @@ var CleanGenerator = yeoman.generators.NamedBase.extend({
 	init: function(args, options){
 		this.on('end', function () {
 			console.log(chalk.red('Cleaning End!'));
-		});		
+		});
 	},
 
 	clean: function () {
@@ -33,13 +33,13 @@ var CleanGenerator = yeoman.generators.NamedBase.extend({
 			}
 
 			if (props.answer) {
-		  		console.log(chalk.cyan('Start cleaning directory (' + process.cwd() + ')'));
+				console.log(chalk.cyan('Start cleaning directory (' + process.cwd() + ')'));
 
-		  		if (!fs.existsSync(process.cwd())) {
+				if (!fs.existsSync(process.cwd())) {
 					fs.mkdir(process.cwd(), '0755', function () {
 					done();
 				});
-		  	} else {
+			} else {
 				var files = fs.readdirSync(process.cwd());
 				var self = this;
 				var iteratorElement = files.length;
@@ -62,8 +62,9 @@ var CleanGenerator = yeoman.generators.NamedBase.extend({
 				});
 			}
 		} else {
-				console.log(chalk.green('See ya'));
-				return false;
+				//console.log(chalk.green('See ya'));
+				//return false;
+				done();
 		}
 		}.bind(this));
 	}

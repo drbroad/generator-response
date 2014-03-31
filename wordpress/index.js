@@ -6,9 +6,9 @@ var chalk = require('chalk');
 var art = require('../util/art');
 var wp = require('wp-util');
 var Wordpress = require('../util/wordpress');
-var Logger			= require('../util/logger');
-var Config       = require('../util/config');
-var	spawn  	= require('child_process').spawn;
+var Logger = require('../util/logger');
+var Config = require('../util/config');
+var spawn = require('child_process').spawn;
 
 var WordpressGenerator = yeoman.generators.Base.extend({
 
@@ -44,7 +44,7 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 			me.logger.verbose('Got current WP version: ' + ver);
 			me.conf.set('wpVer', ver);
 			done();
-		});		
+		});
 	},
 
 	askFor: function () {
@@ -109,7 +109,7 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 		var done = this.async();
 		var me = this;
 		var input = me.input;
-			
+
 		// Create a wordpress site instance
 		me.wpSite = new wp.Site({
 			contentDirectory: input.contentDir,
@@ -149,7 +149,7 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 				done();
 			});
 
-		}		
+		}
 
 		console.log(chalk.cyan('WORDPRESS Install END'));
 	},
@@ -201,24 +201,24 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 		var done = this.async();
 		var self = this;
 		var composer = spawn('composer', ['update']);
-		        
 
-		    composer.stdout.on('data', function (data) {
-		     console.log(chalk.green('composer: ') + (data.toString().replace(/\n/g, '')));
-		    });
 
-		    composer.stderr.on('data', function (data) {
-		      console.log(chalk.red('Content error ') + data, true);
-		      // Composer doesn't exist
-		    });
-		    composer.stderr.on('close', function (code) {
-		      if (!code) {
-		        console.log(chalk.green('Content installed '));
-		        done();
-		      } else {
-		        console.log(chalk.red('Content error ') + code);
-		      }
-		    });					
+			composer.stdout.on('data', function (data) {
+			 console.log(chalk.green('composer: ') + (data.toString().replace(/\n/g, '')));
+			});
+
+			composer.stderr.on('data', function (data) {
+			  console.log(chalk.red('Content error ') + data, true);
+			  // Composer doesn't exist
+			});
+			composer.stderr.on('close', function (code) {
+			  if (!code) {
+				console.log(chalk.green('Content installed '));
+				done();
+			  } else {
+				console.log(chalk.red('Content error ') + code);
+			  }
+			});
 	}
 });
 
