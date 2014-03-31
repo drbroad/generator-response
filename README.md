@@ -36,3 +36,20 @@ Lots of things need to be added:
   - add gulp to dependencies
   - build out gulpfiles
   - tidy up WP install
+  - Configure all composer,bower, package files with app name, author etc
+  - configure content defaults based on the install type
+  - decouple as much as possible!
+  - refine the clean task
+  - develop the logging task
+  - list potential subtasks needed
+  - using git as a submodule?
+  - list of plugins/theme options
+  - clean unused themes except 2014
+  - prompt for git remote
+  - init git at the very end of everything
+  - create a less/aseets subgenerator?
+  - create repo for design assets
+  - remove unwanted themes
+  - add our author stuff to the response theme
+  
+  

@@ -76,7 +76,9 @@ var ResponseGenerator = yeoman.generators.Base.extend({
 		}
 
 
-
+		/*
+		Suspect these should be moved into individual generators - decouple EVERYTHING!
+		 */
 
 		this.on('end', function () {
 			this.installDependencies({
@@ -106,7 +108,7 @@ var ResponseGenerator = yeoman.generators.Base.extend({
 			chalk.red("\n                   | |                              ") +
 			chalk.red("\n                   |_|                              ");
 
-		//console.log(welcome);
+		console.log(welcome);
 
 
 	},
@@ -140,8 +142,13 @@ var ResponseGenerator = yeoman.generators.Base.extend({
 				]
 			},
 			{
+				name: "clientName",
+				message: 'Who is the client for this project?',
+				default: 'Playground'
+			},			
+			{
 				name: "appName",
-				message: "What would you like to call this project?",
+				message: 'What is the name of this project?',
 				default: "Playground"
 			}
 		];

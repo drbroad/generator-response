@@ -21,38 +21,38 @@ var FlatfileGenerator = yeoman.generators.Base.extend({
 		this.pkg = yeoman.file.readJSON(path.join(__dirname, '../package.json'));
 
 		this.on('end', function () {
-			// this.installDependencies({
-			// 	bower: true,
-			// 	npm: true,
-			// 	skipInstall: false,
-			// 	callback: function () {
-			// 		console.log(chalk.magenta ( 'Everything is ready! Running grunt build...') );
-			// 		this.emit('dependenciesInstalled');
-			// 	}.bind(this)
-			// });
+			this.installDependencies({
+				bower: true,
+				npm: true,
+				skipInstall: false,
+				callback: function () {
+					console.log(chalk.magenta ( 'Everything is ready! Running grunt build...') );
+					this.emit('dependenciesInstalled');
+				}.bind(this)
+			});
 		});
 
 		// Now you can bind to the dependencies installed event
-		this.on('dependenciesInstalled', function() {
+		this.on('dependenciesInstalled', function () {
 			this.spawnCommand('grunt');
 		});
 	},
 
-	commonPrompts: function () {
+	commonOptions: function () {
 		var done = this.async();
 		var me = this;
 		console.log(chalk.magenta('Response:  Opts'));
 
-		var setOpts = function () {
-		console.log(chalk.magenta('Response:  setOpts'));
+		me.prompt(prompts(me.options.advanced, me.conf.get()), function (inputs) {
+			this.inputs = inputs;
+			done();
+		}.bind(this));
 
-			me.prompt(prompts(me.options.advanced, me.conf.get()), function(input) {
-				done();
-			});
-		}
-
-		setOpts();
 	},
+
+	// myOptions: function () {
+
+	// },
 
 	askFor: function () {
 		var done = this.async();

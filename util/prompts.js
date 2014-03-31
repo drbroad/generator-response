@@ -17,6 +17,18 @@ module.exports = function(advanced, defaults) {
 
 	return [
 		{
+			name: 'clientName',
+			message: 'Who is the client for this project?',
+			default: 'Playground',
+			validate: requiredValidate
+		},
+		{
+			name: 'appName',
+			message: 'What is the name of this project?',
+			default: 'Playground',
+			validate: requiredValidate
+		},
+		{
 			type: "checkbox",
 			name: "libs",
 			message: "What libraries would you like to use?",
@@ -42,16 +54,6 @@ module.exports = function(advanced, defaults) {
 			when: function(props){
 				return props.generatorType === _TYPE_FLAT;
 			}
-		},
-		{
-			name: "appName",
-			message: "What would you like to call this project?",
-			default: "Playground"
-		},
-		{
-			name: "author",
-			message: "What is the authors (your) name?",
-			default: "Marc Broad"
 		},
 		{
 			name: "authorEmail",

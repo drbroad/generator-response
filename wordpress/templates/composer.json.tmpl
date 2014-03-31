@@ -1,5 +1,5 @@
 {
-	"name": "response/brilliant-wordpress-site",
+	"name": "response/<%= conf.get('contentDir') %>",
 	"description": "My brilliant WordPress site",
 	"extra": {
 		"installer-paths": {
@@ -15,8 +15,7 @@
 	],
 	"require": {
 		"aws/aws-sdk-php":"*",
-		"wpackagist-plugin/advanced-custom-fields":"*",
-
+		"wpackagist-plugin/advanced-custom-fields":"*"
 	},
 	"autoload": {
 		"psr-0": {

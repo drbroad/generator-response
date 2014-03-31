@@ -35,9 +35,7 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 	wordpressInstall: function () {
 		var done = this.async();
 		var me = this;
-		console.log(chalk.cyan('WORDPRESS Install'));
 
-		// Get the current version number of wordpress
 		this.logger.verbose('Getting current WP version');
 		Wordpress.getCurrentVersion(function(err, ver) {
 			if (err) me.logger.warn('Error getting WP versions.  Falling back to ' + ver);
@@ -46,6 +44,18 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 			done();
 		});
 	},
+
+	// commonOptions: function () {
+	// 	var done = this.async();
+	// 	var me = this;
+	// 	console.log(chalk.magenta('Response:  Opts'));
+
+	// 	me.prompt(prompts(me.options.advanced, me.conf.get()), function (inputs) {
+	// 		this.inputs = inputs;
+	// 		done();
+	// 	}.bind(this));
+	// },
+
 
 	askFor: function () {
 		var done = this.async();
@@ -219,7 +229,39 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 				console.log(chalk.red('Content error ') + code);
 			  }
 			});
+	},
+
+	// Install and activate the theme
+	dumbledoreHasStyle: function () {
+
+		if (this.conf.get('installTheme')) {
+			var me = this,
+				done = this.async();
+
+			this.logger.log('Starting to install theme');
+			Wordpress.installTheme(this, this.conf.get(), function() {
+				/* @TODO You need to run the install before doing this
+				   see if I can get yeopress to do that.
+			    */
+				//wordpress.activateTheme(me.conf.get(), done);
+				me.logger.verbose('Theme install complete');
+				done();
+			});
+		}
+
+	},
+
+	// Setup theme
+	dummyYouHaveToPlugItInFirst: function () {
+
+		if (this.conf.get('installTheme')) {
+			this.logger.log('Starting theme setup');
+			Wordpress.setupTheme(this, this.conf.get(), this.async());
+			this.logger.verbose('Theme setup complete');
+		}
+
 	}
+
 });
 
 module.exports = WordpressGenerator;
