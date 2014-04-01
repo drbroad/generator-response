@@ -16,6 +16,13 @@ module.exports = function(advanced, defaults) {
 	};
 
 	return [
+		{			
+			name: 'jobNum',
+			message: 'Project Job Number:',
+			default: null,
+			validate: requiredValidate,
+			when: advancedWhen,
+		},
 		{
 			name: 'clientName',
 			message: 'Who is the client for this project?',

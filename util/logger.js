@@ -23,18 +23,19 @@ var Logger = function(options) {
 };
 
 Logger.defaultOptions = {
+	seperate            : false,
 	level               : 'error',
 	verbosePrefix       : '>> ',
-	verbosePrefixTheme  : chalk.gray.bold,
+	verbosePrefixTheme  : chalk.yellow.bold,
 	verboseMessageTheme : chalk.white,
 	verboseStream       : process.stdout,
 	logPrefix           : '>> ',
 	logPrefixTheme      : chalk.cyan.bold,
 	logMessageTheme     : chalk.white,
 	logStream           : process.stdout,
-	warnPrefix          : '>> ',
+	warnPrefix          : '!! ',
 	warnPrefixTheme     : chalk.yellow.bold,
-	warnMessageTheme    : chalk.white,
+	warnMessageTheme    : chalk.yellow,
 	warnStream          : process.stdout,
 	errorPrefix         : 'Error: ',
 	errorPrefixTheme    : chalk.red.bold,
@@ -62,7 +63,11 @@ severityLevels.forEach(function(fnc) {
 			} else {
 				console.log(prefix + message);
 			}
-		}
+
+			if (opts['seperate']) {
+				console.log(chalk.cyan('-------------------------------------------'));
+			}
+		} 
 	};
 });
 

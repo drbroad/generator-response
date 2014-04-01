@@ -14,6 +14,7 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 
 	init: function(args, options){
 
+		console.log(this.options);
 		// Setup the logger
 		this.logger = new Logger({
 			level: this.options.log

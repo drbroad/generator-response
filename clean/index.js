@@ -5,6 +5,7 @@ var yeoman = require('yeoman-generator');
 var chalk = require('chalk');
 var fs = require('fs');
 var rimraf = require('rimraf');
+var Logger = require('../util/logger');
 // var q = require('q');
 // var _ = require('underscore');
 // var	spawn = require('child_process').spawn;
@@ -13,13 +14,19 @@ var rimraf = require('rimraf');
 
 var CleanGenerator = yeoman.generators.Base.extend({
 	init: function(args, options){
+		// Setup the logger
+		this.logger = new Logger({
+			level: this.options.log
+		});
+
 		this.on('end', function () {
-			console.log(chalk.red('Cleaning End!'));
+			
 		});
 	},
 
 	clean: function () {
 		var done = this.async();
+		var self = this;
 
 		var prompts = [
 			{
@@ -31,12 +38,13 @@ var CleanGenerator = yeoman.generators.Base.extend({
 		];
 
 		this.prompt(prompts, function (props) {
+
 			if (typeof props === 'undefined') {console.log('See ya'.green);
 				return false;
 			}
 
 			if (props.answer) {
-				console.log(chalk.cyan('Start cleaning directory (' + process.cwd() + ')'));
+				self.logger.warn('Cleaning has begun...');
 
 				if (!fs.existsSync(process.cwd())) {
 					fs.mkdir(process.cwd(), '0755', function () {
@@ -44,7 +52,7 @@ var CleanGenerator = yeoman.generators.Base.extend({
 					});
 				} else {
 					var files = fs.readdirSync(process.cwd());
-					var self = this;
+					
 					var iteratorElement = files.length;
 
 					if (iteratorElement === 0) {
@@ -56,9 +64,9 @@ var CleanGenerator = yeoman.generators.Base.extend({
 					files.forEach(function (item) {
 						rimraf(process.cwd() + path.sep + item, function () {
 							iterator++;
-							console.log(chalk.yellow(item) + chalk.red(' Deleted'));
+							self.logger.error(item + ' Deleted!');
 							if (iterator >= iteratorElement) {
-								console.log(chalk.green('Cleaning done'));
+								self.logger.warn('Cleaning has finished!');
 								done();
 							}
 						});
@@ -66,8 +74,8 @@ var CleanGenerator = yeoman.generators.Base.extend({
 				}
 
 			} else {
-				//console.log(chalk.green('See ya'));
-				//return false;
+				this.logger.warn('Exiting without cleaning the install directory');
+				this.logger.error('This may cause some overwriting issues!');
 				done();
 			}
 		}.bind(this));

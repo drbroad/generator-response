@@ -66,6 +66,7 @@ var ResponseGenerator = yeoman.generators.Base.extend({
 			level: this.options.log
 		});
 
+
 		// Log the options
 		try {
 			this.logger.verbose('\nOptions: ' + JSON.stringify(this.options, null, '  '));
@@ -109,15 +110,14 @@ var ResponseGenerator = yeoman.generators.Base.extend({
 			chalk.red("\n                   |_|                              ");
 
 		console.log(welcome);
-
-
+		this.logger.log('You\'re using the fantastic RespLaravel generator.');
+		this.logger.log('Get your project underway with a few taps of your finger!', {seperate: true});
 	},
 
 	askFor: function () {
 		var done = this.async();
 
-		console.log(chalk.cyan('You\'re using the fantastic RespLaravel generator.'));
-		console.log(chalk.magenta('Response:  Scaffold your latest project.'));
+		this.logger.warn('First up, lets figure out what kind of project you need...');
 
 		var prompts = [
 			{
@@ -154,7 +154,7 @@ var ResponseGenerator = yeoman.generators.Base.extend({
 		];
 
 		this.prompt(prompts, function (props) {
-			this.options = props;
+			this.env.options = props;
 
 			// this.jobName = props.jobName;
 			// this.author = props.author;

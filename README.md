@@ -51,5 +51,6 @@ Lots of things need to be added:
   - create repo for design assets
   - remove unwanted themes
   - add our author stuff to the response theme
+  - make logger a special color, make the warn a brighter colour
   
   
