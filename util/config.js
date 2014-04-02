@@ -1,15 +1,16 @@
 /**================================
- * YeoPress config wrapper
+ * Response Generator config wrapper
  **===============================*/
 
 // Requirements
 var fs = require('fs'),
 	path = require('path');
 
+
 // Constructor
 var Config = module.exports = function(locals, globals) {
 	// Default config file name
-	this.filename = '.yeopress';
+	this.filename = '.response';
 
 	// Load files
 	this.global = this.load(path.join(process.env.HOME  || process.env.USERPROFILE, this.filename)) || {};

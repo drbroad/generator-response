@@ -1,4 +1,5 @@
 'use strict';
+var Settings = require('../util/constants');
 
 module.exports = function(advanced, defaults) {
 
@@ -14,6 +15,9 @@ module.exports = function(advanced, defaults) {
 	var advancedWhen = function () {
 		return advanced;
 	};
+
+	// Setup the Global settings
+	this.settings = Settings.getInstance();
 
 	return [
 		{			
@@ -54,29 +58,6 @@ module.exports = function(advanced, defaults) {
 							value: "js-angular"
 						}
 					]
-		},
-		{
-			name: "webDir",
-			message: "What would you like to name the www dir (www, public, httpdocs etc...)?",
-			when: function(props){
-				return props.generatorType === _TYPE_FLAT;
-			}
-		},
-		{
-			name: "authorEmail",
-			message: "What is your email?",
-			default: "mbroad@thepowertoprovoke.com"
-		},
-		{
-			type: "confirm",
-			name: "IE8",
-			message: "Do you need IE8 support (jquery 1.9, respond.js) ?",
-			default: false
-		},
-		{
-			name: "bowerDir",
-			message: "What directory would you like bower to install components to?",
-			default: "vendor"
-		},
+		}
 	];
 };

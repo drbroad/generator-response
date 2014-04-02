@@ -1,24 +1,29 @@
 'use strict';
 var util = require('util');
 var path = require('path');
+var fs = require('fs');
 var yeoman = require('yeoman-generator');
 var chalk = require('chalk');
 var art = require('../util/art');
 var wp = require('wp-util');
+var git= require('simple-git')();
 var Wordpress = require('../util/wordpress');
 var Logger = require('../util/logger');
 var Config = require('../util/config');
 var spawn = require('child_process').spawn;
+var Settings = require('../util/constants');
 
 var WordpressGenerator = yeoman.generators.Base.extend({
 
 	init: function(args, options){
-
-		console.log(this.options);
 		// Setup the logger
 		this.logger = new Logger({
 			level: this.options.log
 		});
+
+		// Setup the Global settings
+		this.settings = Settings.getInstance();
+		console.log(this.settings.get());
 
 		// Load the config files
 		this.conf = new Config();
@@ -28,8 +33,6 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 		this.on('end', function () {
 
 		});
-
-
 
 	},
 
@@ -46,16 +49,15 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 		});
 	},
 
-	// commonOptions: function () {
-	// 	var done = this.async();
-	// 	var me = this;
-	// 	console.log(chalk.magenta('Response:  Opts'));
+	commonOptions: function () {
+		var done = this.async();
+		var me = this;
 
-	// 	me.prompt(prompts(me.options.advanced, me.conf.get()), function (inputs) {
-	// 		this.inputs = inputs;
-	// 		done();
-	// 	}.bind(this));
-	// },
+		me.prompt(require('../util/prompts')(me.options.advanced, me.conf.get()), function (input) {
+			me.settings.set(input);
+			done();
+		}.bind(this));
+	},
 
 
 	askFor: function () {
@@ -63,13 +65,14 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 		var me = this;
 
 		var setOpts = function () {
-			me.prompt(require('./prompts')(me.options.advanced, me.conf.get()), function(input) {
+			me.prompt(require('./prompts')(me.options.advanced, me.conf.get()), function (input) {
 				me.prompt([{
 					message: 'Does this all look correct?',
 					name: 'confirm',
 					type: 'confirm'
-				}], function(i) {
+				}], function (i) {
 					if (i.confirm) {
+						me.settings.set(input);
 						me.input = input;
 						done();
 					} else {
@@ -78,13 +81,14 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 					}
 				});
 			});
-		}
+		};
 
 		setOpts();
 	},
 
 	storeOpts: function () {
 		var me = this;
+		var done = this.async();
 		var input = me.input;
 
 		// Set port
@@ -111,12 +115,39 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 		me.logger.verbose('User Input: ' + JSON.stringify(me.conf.get(), null, '  '));
 		me.logger.log(art.go, {logPrefix: ''});
 
+		this._countdown(done);
+	},
+
+	_countdown : function (callback) {
+		var counter = 4;
+		var me = this;
+
+		function decrease() {
+			counter --;
+			if (counter > 0) {
+				switch (counter)
+				{
+					case 3:
+						me.logger.log(art.three, {logPrefix: ''});
+						break;
+					case 2:
+						me.logger.log(art.two, {logPrefix: ''});
+						break;
+					case 1:
+						me.logger.log(art.one, {logPrefix: ''});
+						break;
+				}
+				setTimeout(decrease, 1000);
+			}
+			else
+			{
+				callback();
+			}
+		}
+		decrease();
 	},
 
 	installation: function () {
-
-		console.log(chalk.cyan('WORDPRESS Install'));
-
 		var done = this.async();
 		var me = this;
 		var input = me.input;
@@ -208,33 +239,30 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 	},
 
 	composeThisBiatch: function () {
-
 		var done = this.async();
-		var self = this;
 		var composer = spawn('composer', ['update']);
 
+		composer.stdout.on('data', function (data) {
+			console.log(chalk.green('composer: ') + (data.toString().replace(/\n/g, '')));
+		});
 
-			composer.stdout.on('data', function (data) {
-			 console.log(chalk.green('composer: ') + (data.toString().replace(/\n/g, '')));
-			});
+		composer.stderr.on('data', function (data) {
+			console.log(chalk.red('Content error ') + data, true);
+			// Composer doesn't exist
+		});
 
-			composer.stderr.on('data', function (data) {
-			  console.log(chalk.red('Content error ') + data, true);
-			  // Composer doesn't exist
-			});
-			composer.stderr.on('close', function (code) {
-			  if (!code) {
+		composer.stderr.on('close', function (code) {
+			if (!code) {
 				console.log(chalk.green('Content installed '));
 				done();
-			  } else {
+			} else {
 				console.log(chalk.red('Content error ') + code);
-			  }
-			});
+			}
+		});
 	},
 
 	// Install and activate the theme
 	dumbledoreHasStyle: function () {
-
 		if (this.conf.get('installTheme')) {
 			var me = this,
 				done = this.async();
@@ -261,6 +289,21 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 			this.logger.verbose('Theme setup complete');
 		}
 
+	},
+
+	// Save settings to .yeopress file
+	_saveDaSettings: function () {
+
+		this.logger.log('Writing .yeopress file');
+		fs.writeFileSync('.yeopress', JSON.stringify(this.conf.get(), null, '\t'));
+
+	},
+
+	// All done
+	oopsIPeedMyself: function () {
+		this.logger.alert('\nAll Done!!\n------------------------\n', {alertPrefix: ''});
+		this.logger.alert('I tried my best to set things up, but I\'m only human right? **wink wink**\nSo, you should probably check your `wp-config.php` to make sure all the settings work on your environment.', {alertPrefix: ''});
+		this.logger.alert('Have fun pressing your words!\n', {alertPrefix: ''});
 	}
 
 });

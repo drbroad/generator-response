@@ -1,0 +1,18 @@
+{
+	"wpVer": "3.8.1",
+	"url": "http://sfdgsdfgs",
+	"tablePrefix": "wp_",
+	"dbHost": "127.0.0.1",
+	"dbName": "wp_client",
+	"dbUser": "response",
+	"dbPass": "db_pass",
+	"git": false,
+	"customDirs": true,
+	"wpDir": "wordpress",
+	"contentDir": "content",
+	"installTheme": true,
+	"themeDir": "response",
+	"themeUser": "roots",
+	"themeRepo": "roots",
+	"themeBranch": "master",
+}

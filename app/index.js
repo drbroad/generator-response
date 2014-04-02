@@ -5,42 +5,15 @@ var yeoman = require('yeoman-generator');
 var chalk = require('chalk');
 
 var Logger			= require('../util/logger');
-
-var _TYPE_LARAVEL	= 'Laravel';
-var _TYPE_FLAT		= 'HTML/Flatfile';
-var _TYPE_WORDPRESS	= 'Wordpress';
-var _TYPE_EMAIL		= 'Email Campaign';
-
-/**
- * There may be a need for a config dictionary for install types...
- */
-
-// var config =	[
-
-// 					_TYPE_LARAVEL = {
-
-// 					},
-// 					_TYPE_FLAT = {
-
-// 					},
-// 					_TYPE_WORDPRESS = {
-
-// 					},
-// 					_TYPE_EMAIL = {
-
-// 					}
-
-// 				];
-
+var Settings		= require('../util/constants');
 
 var ResponseGenerator = yeoman.generators.Base.extend({
 	init: function () {
 		this.pkg = yeoman.file.readJSON(path.join(__dirname, '../package.json'));
 
-
 		// Log level option
 		this.option('log', {
-			desc: 'The log verbosity level: [ verbose | log | warn | error ]',
+			desc: 'The log verbosity level: [ verbose | log | warn | error | alert ]',
 			defaults: 'log',
 			alias: 'l',
 			name: 'level'
@@ -66,6 +39,8 @@ var ResponseGenerator = yeoman.generators.Base.extend({
 			level: this.options.log
 		});
 
+		// Setup the Global settings
+		this.settings = Settings.getInstance();
 
 		// Log the options
 		try {
@@ -80,7 +55,6 @@ var ResponseGenerator = yeoman.generators.Base.extend({
 		/*
 		Suspect these should be moved into individual generators - decouple EVERYTHING!
 		 */
-
 		this.on('end', function () {
 			this.installDependencies({
 				bower: true,
@@ -100,16 +74,16 @@ var ResponseGenerator = yeoman.generators.Base.extend({
 
 	setup: function () {
 		var welcome =
-			chalk.red("\n  _____                                             ") +
-			chalk.red("\n |  __ \\                                            ") +
-			chalk.red("\n | |__) | ___  ___  _ __    ___   _ __   ___   ___  ") +
-			chalk.red("\n |  _  / / _ \\/ __|| '_ \\  / _ \\ | '_ \\ / __| / _ \\ ") +
-			chalk.red("\n | | \\ \\|  __/\\__ \\| |_) || (_) || | | |\\__ \\|  __/ ") +
-			chalk.red("\n |_|  \\_\\\\___||___/| .__/  \\___/ |_| |_||___/ \\___| ") +
-			chalk.red("\n                   | |                              ") +
-			chalk.red("\n                   |_|                              ");
+			chalk.red.bold("\n  _____                                             ") +
+			chalk.red.bold("\n |  __ \\                                            ") +
+			chalk.red.bold("\n | |__) | ___  ___  _ __    ___   _ __   ___   ___  ") +
+			chalk.red.bold("\n |  _  / / _ \\/ __|| '_ \\  / _ \\ | '_ \\ / __| / _ \\ ") +
+			chalk.red.bold("\n | | \\ \\|  __/\\__ \\| |_) || (_) || | | |\\__ \\|  __/ ") +
+			chalk.red.bold("\n |_|  \\_\\\\___||___/| .__/  \\___/ |_| |_||___/ \\___| ") +
+			chalk.red.bold("\n                   | |                              ") +
+			chalk.red.bold("\n                   |_|                              ");
 
-		console.log(welcome);
+		//console.log(welcome);
 		this.logger.log('You\'re using the fantastic RespLaravel generator.');
 		this.logger.log('Get your project underway with a few taps of your finger!', {seperate: true});
 	},
@@ -121,79 +95,57 @@ var ResponseGenerator = yeoman.generators.Base.extend({
 
 		var prompts = [
 			{
-				type: "list",
-				name: "generatorType",
-				message: "What kind of project would you like to generate?",
+				type: 'list',
+				name: 'generatorType',
+				message: 'What kind of project would you like to generate?',
 				choices: [
-						{
-							name: "Laravel",
-							value: _TYPE_LARAVEL
-						},{
-							name: "HTML Flatfile",
-							value: _TYPE_FLAT
-						},
-						{
-							name: "Wordpress",
-							value: _TYPE_WORDPRESS
-						},{
-							name: "Email Template",
-							value: _TYPE_EMAIL
-						}
+					{
+						name: 'Laravel',
+						value: this.settings.getOpt('_TYPE_LARAVEL')
+					},
+					{
+						name: 'HTML Flatfile',
+						value: this.settings.getOpt('_TYPE_FLAT')
+					},
+					{
+						name: 'Wordpress',
+						value: this.settings.getOpt('_TYPE_WORDPRESS')
+					},
+					{
+						name: 'Email Template',
+						value: this.settings.getOpt('_TYPE_EMAIL')
+					}
 				]
-			},
-			{
-				name: "clientName",
-				message: 'Who is the client for this project?',
-				default: 'Playground'
-			},			
-			{
-				name: "appName",
-				message: 'What is the name of this project?',
-				default: "Playground"
 			}
 		];
 
 		this.prompt(prompts, function (props) {
 			this.env.options = props;
-
-			// this.jobName = props.jobName;
-			// this.author = props.author;
-			// this.authorEmail = props.authorEmail;
-			// this.jqueryVersion = "~2.1.0";
-			// this.bowerDir = props.bowerDir;
-			// this.IE8 = props.IE8;
-
-			// if (props.IE8){
-			// 	this.jqueryVersion = "1.9.0";
-			// }
-			this.appName 		= props.appName;
-			this.generatorType 	= props.generatorType;
-
 			done();
 		}.bind(this));
 	},
 
 	clean: function () {
 		var done = this.async();
-		this.invoke('response:clean', { args: [this.appName], options: this.options }, done);
+		this.invoke('response:clean', { args: [], options: this.options }, done);
 	},
 
 	app: function () {
 		var done = this.async();
 		var subGenerator;
 
-		switch (this.generatorType)
+		switch (this.env.options.generatorType)
 		{
-			case _TYPE_LARAVEL:
+			case this.settings.getOpt('_TYPE_LARAVEL'):
 				subGenerator = 'response:laravel';
 				break;
-			case _TYPE_WORDPRESS:
+			case this.settings.getOpt('_TYPE_WORDPRESS'):
 				subGenerator = 'response:wordpress';
 				break;
-			case _TYPE_EMAIL:
+			case this.settings.getOpt('_TYPE_EMAIL'):
 				subGenerator = 'response:email';
 				break;
-			case _TYPE_FLAT:
+			case this.settings.getOpt('_TYPE_FLAT'):
 				subGenerator = 'response:flat';
 				break;
 			default:
@@ -201,7 +153,8 @@ var ResponseGenerator = yeoman.generators.Base.extend({
 				break;
 		}
 
-		this.invoke(subGenerator, { args: [ this.appName ], options: this.options }, done);
+		this.settings.set('installType', this.env.options.generatorType);
+		this.invoke(subGenerator, {args: [], options: this.options }, done);
 		//done();
 	},
 

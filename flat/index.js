@@ -1,11 +1,12 @@
 'use strict';
-var util = require('util');
+//var util = require('util');
 var path = require('path');
 var yeoman = require('yeoman-generator');
 var chalk = require('chalk');
 var prompts = require('../util/prompts');
 var Logger = require('../util/logger');
 var Config = require('../util/config');
+var Settings = require('../util/constants');
 
 var FlatfileGenerator = yeoman.generators.Base.extend({
 	init: function () {
@@ -14,6 +15,9 @@ var FlatfileGenerator = yeoman.generators.Base.extend({
 		this.logger = new Logger({
 			level: this.options.log
 		});
+
+		// Setup the Global settings
+		this.settings = Settings.getInstance();
 
 		// Load the config files
 		this.conf = new Config();
@@ -41,18 +45,20 @@ var FlatfileGenerator = yeoman.generators.Base.extend({
 	commonOptions: function () {
 		var done = this.async();
 		var me = this;
-		console.log(chalk.magenta('Response:  Opts'));
 
 		me.prompt(prompts(me.options.advanced, me.conf.get()), function (inputs) {
-			this.inputs = inputs;
+			var type = this.env.options.generatorType;
+			this.env.options[type] = inputs;
 			done();
 		}.bind(this));
 
 	},
 
-	// myOptions: function () {
-
-	// },
+	myOptions: function () {
+		var done = this.async();
+		console.log(this.commonOpts);
+		console.log(this.env.options);
+	},
 
 	askFor: function () {
 		var done = this.async();
@@ -98,8 +104,39 @@ var FlatfileGenerator = yeoman.generators.Base.extend({
 				this.jqueryVersion = "1.9.0";
 			}
 
-			done();
+			me.logger.log(art.go, {logPrefix: ''});
+			this._countdown(done);
+
 		}.bind(this));
+	},
+
+	_countdown : function (callback) {
+		var counter = 4;
+		var me = this;
+
+		function decrease() {
+			counter --;
+			if (counter > 0) {
+				switch (counter)
+				{
+					case 3:
+						me.logger.log(art.three, {logPrefix: ''});
+						break;
+					case 2:
+						me.logger.log(art.two, {logPrefix: ''});
+						break;
+					case 1:
+						me.logger.log(art.one, {logPrefix: ''});
+						break;
+				}
+				setTimeout(decrease, 1000);
+			}
+			else
+			{
+				callback();
+			}
+		}
+		decrease();
 	},
 
 	app: function () {

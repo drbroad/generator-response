@@ -1,5 +1,6 @@
-var util 	= require('util');
-var chalk 	= require('chalk');
+'use strict';
+var util = require('util');
+var chalk = require('chalk');
 
 // Utility extend
 function extend(obj) {
@@ -11,21 +12,23 @@ function extend(obj) {
 			}
 		}
 	}
-    return obj;
-};
+	return obj;
+}
 
 // The supported severity levels
-var severityLevels = ['verbose', 'log', 'warn', 'error'];
+var severityLevels = ['verbose', 'log', 'warn', 'error', 'alert'];
 
-var Logger = function(options) {
-	if (!(this instanceof Logger)) return new Logger(options);
+var Logger = function (options) {
+	if (!(this instanceof Logger)) {
+		return new Logger(options);
+	}
 	this.options = extend({}, Logger.defaultOptions, options);
 };
 
 Logger.defaultOptions = {
 	seperate            : false,
 	level               : 'error',
-	verbosePrefix       : '>> ',
+	verbosePrefix       : '** ',
 	verbosePrefixTheme  : chalk.yellow.bold,
 	verboseMessageTheme : chalk.white,
 	verboseStream       : process.stdout,
@@ -34,17 +37,21 @@ Logger.defaultOptions = {
 	logMessageTheme     : chalk.white,
 	logStream           : process.stdout,
 	warnPrefix          : '!! ',
-	warnPrefixTheme     : chalk.yellow.bold,
-	warnMessageTheme    : chalk.yellow,
+	warnPrefixTheme     : chalk.white.bold,
+	warnMessageTheme    : chalk.magenta,
 	warnStream          : process.stdout,
 	errorPrefix         : 'Error: ',
 	errorPrefixTheme    : chalk.red.bold,
 	errorMessageTheme   : chalk.red,
-	errorStream         : process.stderr
+	errorStream         : process.stderr,
+	alertPrefix         : '[>]',
+	alertPrefixTheme    : chalk.green.bold,
+	alertMessageTheme   : chalk.green,
+	alertStream         : process.stderr
 };
 
-severityLevels.forEach(function(fnc) {
-	Logger.prototype[fnc] = function(out, opts) {
+severityLevels.forEach(function (fnc) {
+	Logger.prototype[fnc] = function (out, opts) {
 		if (severityLevels.indexOf(fnc) >= severityLevels.indexOf(this.options.level)) {
 			opts = extend({}, this.options, opts);
 			var prefix = opts[fnc + 'PrefixTheme'](opts[fnc + 'Prefix']);
@@ -53,7 +60,7 @@ severityLevels.forEach(function(fnc) {
 			if (typeof out === 'object') {
 				message = opts[fnc + 'MessageTheme'](util.inspect(out));
 			} else {
-				message = opts[fnc + 'MessageTheme'](out+'');
+				message = opts[fnc + 'MessageTheme'](out + '');
 			}
 
 			if (typeof opts[fnc + 'Stream'] === 'function') {
@@ -64,10 +71,10 @@ severityLevels.forEach(function(fnc) {
 				console.log(prefix + message);
 			}
 
-			if (opts['seperate']) {
+			if (opts.seperate) {
 				console.log(chalk.cyan('-------------------------------------------'));
 			}
-		} 
+		}
 	};
 });
 
