@@ -4,8 +4,10 @@ var path = require('path');
 var yeoman = require('yeoman-generator');
 var chalk = require('chalk');
 
-var Logger			= require('../util/logger');
-var Settings		= require('../util/constants');
+var Logger = require('../util/logger');
+var Settings = require('../util/constants');
+var Globals = require('../config');
+
 
 var ResponseGenerator = yeoman.generators.Base.extend({
 	init: function () {
@@ -42,6 +44,9 @@ var ResponseGenerator = yeoman.generators.Base.extend({
 		// Setup the Global settings
 		this.settings = Settings.getInstance();
 
+		// Setup the Globals settings
+		//this.globals = Globals.getInstance();
+
 		// Log the options
 		try {
 			this.logger.verbose('\nOptions: ' + JSON.stringify(this.options, null, '  '));
@@ -70,6 +75,11 @@ var ResponseGenerator = yeoman.generators.Base.extend({
 		this.on('dependenciesInstalled', function () {
 			this.spawnCommand('grunt');
 		});
+	},
+
+	glob: function () {
+		var done = this.async();
+		this.invoke('response:config', { args: [], options: this.options }, done);
 	},
 
 	setup: function () {

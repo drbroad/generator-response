@@ -149,31 +149,24 @@ function getDbCredentials() {
 	return ee;
 };
 
-function createDBifNotExists(callback) {
+function createDBifNotExists(db, callback) {
 	var ee = new EventEmitter();
+	var connection = mysql.createConnection({
+		host     : db.dbHost,
+		user     : db.dbUser,
+		password : db.dbPass,
+		socketPath: db.socketPath
+	});
+	connection.connect(function(err) {
+		if (err) return ee.emit('error', err);
 
-	getDbCredentials().on('done', function(db) {
-
-		var connection = mysql.createConnection({
-			host     : db.host,
-			user     : db.user,
-			password : db.pass
-		});
-
-		connection.connect(function(err) {
+		connection.query('CREATE DATABASE IF NOT EXISTS ' + mysql.escapeId(db.dbName), function(err, rows, fields) {
 			if (err) return ee.emit('error', err);
-
-			connection.query('CREATE DATABASE IF NOT EXISTS ' + mysql.escapeId(db.name), function(err, rows, fields) {
-				if (err) return ee.emit('error', err);
-				connection.end(function() {
-					ee.emit('done');
-				});
+			connection.end(function() {
+				ee.emit('done');
 			});
-
 		});
 
-	}).on('error', function(err) {
-		ee.emit('error', err);
 	});
 
 	if (typeof callback === 'function') {
@@ -244,7 +237,7 @@ function installTheme(generator, config, done) {
 };
 
 function setupTheme(generator, config, done) {
-	
+
 	console.log(chalk.green('Setting Up Theme'));
 
 	var themePath = path.join(config.contentDir, 'themes', config.themeDir),
@@ -292,7 +285,7 @@ function activateTheme(themeName, callback) {
 				"UPDATE " + db.prefix + "options",
 				"SET option_value =  "+ mysql.escape(themeName),
 				"WHERE option_name = 'template'",
-				"OR option_name = 'stylesheet'"	
+				"OR option_name = 'stylesheet'"
 			].join('\n');
 
 			connection.query(q, function(err, rows, fields) {

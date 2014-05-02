@@ -1,12 +1,12 @@
 {
-	"name": "response/<%= conf.get('contentDir') %>",
+	"name": "response/<%= settings.get('contentDir') %>",
 	"description": "My brilliant WordPress site",
 	"extra": {
 		"installer-paths": {
-			"<%= conf.get('contentDir') %>/plugins/{$name}/": ["type:wordpress-plugin"],
-			"<%= conf.get('contentDir') %>/themes/{$name}/": ["type:wordpress-theme"]
-		} 
-	},    
+			"<%= settings.get('contentDir') %>/plugins/{$name}/": ["type:wordpress-plugin"],
+			"<%= settings.get('contentDir') %>/themes/{$name}/": ["type:wordpress-theme"]
+		}
+	},
 	"repositories":[
 		{
 			"type":"composer",

@@ -47,7 +47,10 @@ module.exports = function(advanced, defaults) {
 		}, {
 			message: 'Database name',
 			name: 'dbName',
-			default: defaults.dbName || null,
+			default: function(session){
+				console.log(session);
+				return (session.tablePrefix + defaults.appName).split(' ').join('_').toLowerCase();
+			},
 			validate: requiredValidate
 		}, {
 			message: 'Database user',

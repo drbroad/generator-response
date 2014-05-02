@@ -53,16 +53,16 @@ Lots of things need to be added:
   - remove unwanted themes
   - add our author stuff to the response theme
   - consider refactoring to make certain methods private
-  - default config file?
   - add nicer comments at the top of the file
   - clean wordpress index
   - should plugins/themes be another sub generator?
   - rename constants/setting file
   - COMMENT EVERYTHING
-  - determine advanced things
-  - move countdown into a seperate art file invocation
   - computer base .response config
-  - load the configs in
   - build out instructions
   - return to main invoke on templates that arent ready yet
+  - make a 'fast' install option from wordpress
+  - fix local config
+  - push certain logs to verbose
+  - better reporting from long composer calls
   

@@ -1,4 +1,4 @@
-'use strict';
+//'use strict';
 var util = require('util');
 var path = require('path');
 var fs = require('fs');
@@ -7,9 +7,9 @@ var chalk = require('chalk');
 var art = require('../util/art');
 var wp = require('wp-util');
 var git= require('simple-git')();
+var wrench  = require('wrench');
 var Wordpress = require('../util/wordpress');
 var Logger = require('../util/logger');
-var Config = require('../util/config');
 var spawn = require('child_process').spawn;
 var Settings = require('../util/constants');
 
@@ -23,10 +23,6 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 
 		// Setup the Global settings
 		this.settings = Settings.getInstance();
-		console.log(this.settings.get());
-
-		// Load the config files
-		this.conf = new Config();
 
 		this.pkg = yeoman.file.readJSON(path.join(__dirname, '../package.json'));
 
@@ -44,7 +40,7 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 		Wordpress.getCurrentVersion(function(err, ver) {
 			if (err) me.logger.warn('Error getting WP versions.  Falling back to ' + ver);
 			me.logger.verbose('Got current WP version: ' + ver);
-			me.conf.set('wpVer', ver);
+			me.settings.set('wpVer', ver);
 			done();
 		});
 	},
@@ -53,7 +49,7 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 		var done = this.async();
 		var me = this;
 
-		me.prompt(require('../util/prompts')(me.options.advanced, me.conf.get()), function (input) {
+		me.prompt(require('../util/prompts')(me.options.advanced, me.settings.get()), function (input) {
 			me.settings.set(input);
 			done();
 		}.bind(this));
@@ -65,7 +61,7 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 		var me = this;
 
 		var setOpts = function () {
-			me.prompt(require('./prompts')(me.options.advanced, me.conf.get()), function (input) {
+			me.prompt(require('./prompts')(me.options.advanced, me.settings.get()), function (input) {
 				me.prompt([{
 					message: 'Does this all look correct?',
 					name: 'confirm',
@@ -111,8 +107,8 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 		}
 
 		// Save the users input
-		me.conf.set(input);
-		me.logger.verbose('User Input: ' + JSON.stringify(me.conf.get(), null, '  '));
+		me.settings.set(input);
+		me.logger.verbose('User Input: ' + JSON.stringify(me.settings.get(), null, '  '));
 		me.logger.log(art.go, {logPrefix: ''});
 
 		this._countdown(done);
@@ -157,24 +153,26 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 			contentDirectory: input.contentDir,
 			wpBaseDirectory: input.wpDir,
 			databaseCredentials: {
-				host: input.dbHost,
-				user: input.dbUser,
-				password: input.dbPass,
-				name: input.dbName,
-				prefix: input.tablePrefix,
+				host: me.settings.get('dbHost'),
+				user: me.settings.get('dbUser'),
+				password: me.settings.get('dbPass'),
+				name: me.settings.get('dbName'),
+				prefix: me.settings.get('tablePrefix'),
+				dbSocket: me.settings.get('dbSocket')
+
 			}
 		});
 
-		if (this.conf.get('submodule')) {
-			this.logger.log('Installing WordPress ' + this.conf.get('wpVer') + ' as a submodule');
-			git.submoduleAdd(wordpress.repo, this.conf.get('wpDir'), function(err) {
+		if (this.settings.get('submodule')) {
+			this.logger.log('Installing WordPress ' + this.settings.get('wpVer') + ' as a submodule');
+			git.submoduleAdd(Wordpress.repo, this.settings.get('wpDir'), function(err) {
 				if (err) me.logger.error(err);
 
 				me.logger.verbose('Submodule added');
 				var cwd = process.cwd();
-				git._baseDir = me.conf.get('wpDir');
-				me.logger.verbose('Checking out WP version ' + me.conf.get('wpVer'));
-				git.checkout(me.conf.get('wpVer'), function(err) {
+				git._baseDir = me.settings.get('wpDir');
+				me.logger.verbose('Checking out WP version ' + me.settings.get('wpVer'));
+				git.checkout(me.settings.get('wpVer'), function(err) {
 					if (err) me.logger.error(err);
 					git._baseDir = cwd;
 					me.logger.verbose('WordPress installed');
@@ -184,9 +182,9 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 
 		} else {
 
-			this.logger.log('Installing WordPress ' + this.conf.get('wpVer'));
-			this.remote('wordpress', 'wordpress', this.conf.get('wpVer'), function(err, remote) {
-				remote.bulkDirectory('.', me.conf.get('wpDir'));
+			this.logger.log('Installing WordPress ' + this.settings.get('wpVer'));
+			this.remote('wordpress', 'wordpress', this.settings.get('wpVer'), function(err, remote) {
+				remote.bulkDirectory('.', me.settings.get('wpDir'));
 				me.logger.log('WordPress installed');
 				done();
 			});
@@ -198,8 +196,8 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 
 	// Setup custom directory structure
 	somethingsDifferent: function() {
-
-		if (this.conf.get('submodule') || this.conf.get('customDirs')) {
+console.log(this.settings.get());
+		if (this.settings.get('submodule') || this.settings.get('customDirs')) {
 
 			var me = this,
 				done = this.async();
@@ -210,9 +208,11 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 
 
 			this.logger.log('Setting up the content directory');
-			this.remote('wordpress', 'wordpress', this.conf.get('wpVer'), function(err, remote) {
-				remote.directory('wp-content', me.conf.get('contentDir'));
-				me.logger.verbose('Content directory setup');
+			this.remote('wordpress', 'wordpress', this.settings.get('wpVer'), function(err, remote) {
+				remote.directory('wp-content', me.settings.get('contentDir'));
+				//me.logger.verbose('Content directory setup');
+				console.log(me.settings.get());
+				me.logger.warn('Content directory setup');
 				done();
 			});
 		}
@@ -230,7 +230,7 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 				me.logger.error('Failed to get salt keys, remember to change them.');
 			}
 			me.logger.verbose('Salt keys: ' + JSON.stringify(saltKeys, null, '  '));
-			me.conf.set('saltKeys', saltKeys);
+			me.settings.set('saltKeys', saltKeys);
 			me.logger.verbose('Copying wp-config');
 			me.template('wp-config.php.tmpl', 'wp-config.php');
 			done();
@@ -261,18 +261,120 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 		});
 	},
 
+
+
+
+
+
+
+// local-config.php
+localConf: function() {
+	if (this.settings.get('createLocalConfig')) {
+		this.logger.verbose('Copying wp-config');
+		this.template('local-config.php.tmpl', 'local-config.php');
+	}
+},
+
+// Check that the database exists, create it otherwise
+hazBaseData: function() {
+
+	var done = this.async(),
+		me = this;
+
+	//this.wpSite.database.createIfNotExists(function(err) {
+	Wordpress.createDBifNotExists(this.settings.get(), function(err) {
+		if (err) {
+			me.logger.warn('Cannot access database');
+			me.logger.warn('Make sure you create the database and update the credentials in the wp-config.php');
+		}
+		done();
+	});
+
+},
+
+// Set some permissions
+/* @TODO Thinking that maybe permissions should be left up to the user
+   BUT, it seems that the theme stuff needs some permissions set to work....
+*/
+thisIsSparta: function() {
+
+	if (fs.existsSync('.')) {
+		this.logger.log('Setting Permissions: 0755 on .');
+		wrench.chmodSyncRecursive('.', 0755);
+		this.logger.verbose('Done setting permissions on .');
+	}
+
+	if (fs.existsSync(this.settings.get('contentDir'))) {
+		this.logger.log('Setting Permissions: 0775 on ' + this.settings.get('contentDir'));
+		wrench.chmodSyncRecursive(this.settings.get('contentDir'), 0775);
+		this.logger.verbose('Done setting permissions on ' + this.settings.get('contentDir'));
+	}
+
+},
+
+// Create Language directory
+doveIlBagno: function() {
+
+	// Only do this if the user specified a language
+	if (this.settings.get('wpLang')) {
+		var done = this.async(),
+			me = this;
+
+		this.logger.log('Setting up locale files');
+		wp.locale.getLanguage(this.settings.get('wpLang'), this.settings.get('contentDir'), function (err) {
+			if (err) me.logger.error(err);
+			done();
+		});
+	}
+
+},
+
+// Commit the wordpress stuff
+commitThisToMemory: function() {
+
+	if (this.settings.get('git')) {
+		var done = this.async(),
+			me = this;
+
+		this.logger.verbose('Committing WP to Git');
+		git.add('.', function(err) {
+			if (err) me.logger.error(err);
+		}).commit('Installed wordpress', function(err, d) {
+			if (err) me.logger.error(err);
+			me.logger.verbose('Done committing: ' + JSON.stringify(d, null, '  '));
+			done();
+		});
+	}
+
+},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	// Install and activate the theme
 	dumbledoreHasStyle: function () {
-		if (this.conf.get('installTheme')) {
+		if (this.settings.get('installTheme')) {
 			var me = this,
 				done = this.async();
 
 			this.logger.log('Starting to install theme');
-			Wordpress.installTheme(this, this.conf.get(), function() {
+			Wordpress.installTheme(this, this.settings.get(), function() {
 				/* @TODO You need to run the install before doing this
 				   see if I can get yeopress to do that.
-			    */
-				//wordpress.activateTheme(me.conf.get(), done);
+				*/
+				//wordpress.activateTheme(me.settings.get(), done);
 				me.logger.verbose('Theme install complete');
 				done();
 			});
@@ -283,9 +385,9 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 	// Setup theme
 	dummyYouHaveToPlugItInFirst: function () {
 
-		if (this.conf.get('installTheme')) {
+		if (this.settings.get('installTheme')) {
 			this.logger.log('Starting theme setup');
-			Wordpress.setupTheme(this, this.conf.get(), this.async());
+			Wordpress.setupTheme(this, this.settings.get(), this.async());
 			this.logger.verbose('Theme setup complete');
 		}
 
@@ -295,7 +397,7 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 	_saveDaSettings: function () {
 
 		this.logger.log('Writing .yeopress file');
-		fs.writeFileSync('.yeopress', JSON.stringify(this.conf.get(), null, '\t'));
+		fs.writeFileSync('.yeopress', JSON.stringify(this.settings.get(), null, '\t'));
 
 	},
 

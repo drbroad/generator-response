@@ -1,5 +1,4 @@
 'use strict';
-var Settings = require('../util/constants');
 
 module.exports = function(advanced, defaults) {
 
@@ -16,11 +15,8 @@ module.exports = function(advanced, defaults) {
 		return advanced;
 	};
 
-	// Setup the Global settings
-	this.settings = Settings.getInstance();
-
 	return [
-		{			
+		{
 			name: 'jobNum',
 			message: 'Project Job Number:',
 			default: null,

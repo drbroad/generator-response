@@ -13,7 +13,7 @@
  *
  * @package WordPress
  */
- 
+
 // Include local configuration
 if (file_exists(dirname(__FILE__) . '/local-config.php')) {
 	include(dirname(__FILE__) . '/local-config.php');
@@ -21,16 +21,16 @@ if (file_exists(dirname(__FILE__) . '/local-config.php')) {
 
 // Global DB config
 if (!defined('DB_NAME')) {
-	define('DB_NAME', '<%= conf.get('dbName') %>');
+	define('DB_NAME', '<%= settings.get('dbName') %>');
 }
 if (!defined('DB_USER')) {
-	define('DB_USER', '<%= conf.get('dbUser') %>');
+	define('DB_USER', '<%= settings.get('dbUser') %>');
 }
 if (!defined('DB_PASSWORD')) {
-	define('DB_PASSWORD', '<%= conf.get('dbPass') %>');
+	define('DB_PASSWORD', '<%= settings.get('dbPass') %>');
 }
 if (!defined('DB_HOST')) {
-	define('DB_HOST', '<%= conf.get('dbHost') %>');
+	define('DB_HOST', '<%= settings.get('dbHost') %>');
 }
 
 /** Database Charset to use in creating database tables. */
@@ -52,7 +52,7 @@ if (!defined('DB_COLLATE')) {
  *
  * @since 2.6.0
  */
-<%= conf.get('saltKeys') %>
+<%= settings.get('saltKeys') %>
 /**#@-*/
 
 /**
@@ -61,7 +61,7 @@ if (!defined('DB_COLLATE')) {
  * You can have multiple installations in one database if you give each a unique
  * prefix. Only numbers, letters, and underscores please!
  */
-$table_prefix  = '<%= conf.get('tablePrefix') %>';
+$table_prefix  = '<%= settings.get('tablePrefix') %>';
 
 /**
  * WordPress Localized Language, defaults to English.
@@ -71,28 +71,28 @@ $table_prefix  = '<%= conf.get('tablePrefix') %>';
  * de_DE.mo to wp-content/languages and set WPLANG to 'de_DE' to enable German
  * language support.
  */
-define('WPLANG', '<%= conf.get('wpLang') %>');
+define('WPLANG', '<%= settings.get('wpLang') %>');
 
-<% if (conf.get('customDirs')) { %>
+<% if (settings.get('customDirs')) { %>
 /**
  * Set custom paths
  *
  * These are required because wordpress is installed in a subdirectory.
  */
 if (!defined('WP_SITEURL')) {
-	define('WP_SITEURL', 'http://' . $_SERVER['SERVER_NAME'] . '<%= (conf.get('port')) ? ':' + conf.get('port') : '' %>/<%= conf.get('wpDir') %>');
+	define('WP_SITEURL', 'http://' . $_SERVER['SERVER_NAME'] . '<%= (settings.get('port')) ? ':' + settings.get('port') : '' %>/<%= settings.get('wpDir') %>');
 }
 if (!defined('WP_HOME')) {
-	define('WP_HOME',    'http://' . $_SERVER['SERVER_NAME'] . '<%= (conf.get('port')) ? ':' + conf.get('port') : '' %>');
+	define('WP_HOME',    'http://' . $_SERVER['SERVER_NAME'] . '<%= (settings.get('port')) ? ':' + settings.get('port') : '' %>');
 }
 if (!defined('WP_CONTENT_DIR')) {
-	define('WP_CONTENT_DIR', dirname(__FILE__) . '/<%= conf.get('contentDir') %>');
+	define('WP_CONTENT_DIR', dirname(__FILE__) . '/<%= settings.get('contentDir') %>');
 }
 if (!defined('WP_CONTENT_URL')) {
-	define('WP_CONTENT_URL', 'http://' . $_SERVER['SERVER_NAME'] . '<%= (conf.get('port')) ? ':' + conf.get('port') : '' %>/<%= conf.get('contentDir') %>');
+	define('WP_CONTENT_URL', 'http://' . $_SERVER['SERVER_NAME'] . '<%= (settings.get('port')) ? ':' + settings.get('port') : '' %>/<%= settings.get('contentDir') %>');
 }
 <% } %>
-<% if (conf.get('blockExternalRequests')) { %>
+<% if (settings.get('blockExternalRequests')) { %>
 /**
  * Disable external requests
  *

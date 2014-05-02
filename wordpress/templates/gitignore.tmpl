@@ -8,7 +8,7 @@ node_modules
 
 # Ignore config
 local-config.php
-<% if (conf.get('ignoreWPCore')) { %>
+<% if (settings.get('ignoreWPCore')) { %>
 wp-config.php
 <% } %>
 
@@ -42,12 +42,12 @@ contentDirs = [
 	'/wp-cache-config.php'
 ];
 for (var i in contentDirs) {
-	print(conf.get('contentDir') + contentDirs[i] + '\n');
+	print(settings.get('contentDir') + contentDirs[i] + '\n');
 }
 
 if (conf.get('ignoreWPCore')) {
 	print('# WordPress Core\n');
-	wpDir = (conf.get('wpDir') == '.') ? '' : conf.get('wpDir');
+	wpDir = (settings.get('wpDir') == '.') ? '' : settings.get('wpDir');
 	wpDirs = [
 		'/db-config.php',
 		'/index.php',
