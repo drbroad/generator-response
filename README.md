@@ -65,4 +65,5 @@ Lots of things need to be added:
   - fix local config
   - push certain logs to verbose
   - better reporting from long composer calls
+  - add a prompt to create local domain for wordpress or it cant install the domain
   

@@ -10,6 +10,15 @@ module.exports = function(advanced, defaults) {
 		return true;
 	};
 
+	var alphaValidate = function (value) {
+		var regexp = /^[a-zA-Z0-9-_\s]+$/;
+		if (value.search(regexp) == -1){ 
+			return 'Only A-Z 0-9 plus dashes and underscores allowed.'; 
+		}
+
+		return true;
+	}
+
 	// When advanced
 	var advancedWhen = function () {
 		return advanced;
@@ -19,7 +28,7 @@ module.exports = function(advanced, defaults) {
 		{
 			message: 'WordPress URL',
 			name: 'url',
-			default: defaults.url || null,
+			default: (defaults.domainPrefix + '.' + defaults.appName + '.com').toLowerCase() || null,
 			validate: requiredValidate,
 			filter: function (value) {
 				value = value.replace(/\/+$/g, '');
@@ -34,6 +43,10 @@ module.exports = function(advanced, defaults) {
 			default: defaults.wpVer || null,
 			validate: requiredValidate,
 			when: advancedWhen,
+		}, {
+			message: 'Site Title',
+			name: 'siteTitle',
+			validate: alphaValidate,
 		}, {
 			message: 'Table prefix',
 			name: 'tablePrefix',
@@ -70,7 +83,8 @@ module.exports = function(advanced, defaults) {
 			message: 'Use Git?',
 			name: 'git',
 			default: defaults.git || 'N',
-			type: 'confirm'
+			type: 'confirm',
+			when: advancedWhen,
 		}, {
 			message: 'Would you like to install WordPress as a submodule?',
 			name: 'submodule',

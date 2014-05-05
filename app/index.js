@@ -110,6 +110,10 @@ var ResponseGenerator = yeoman.generators.Base.extend({
 				message: 'What kind of project would you like to generate?',
 				choices: [
 					{
+						name: 'Wordpress',
+						value: this.settings.getOpt('_TYPE_WORDPRESS')
+					},
+					{
 						name: 'Laravel',
 						value: this.settings.getOpt('_TYPE_LARAVEL')
 					},
@@ -117,10 +121,7 @@ var ResponseGenerator = yeoman.generators.Base.extend({
 						name: 'HTML Flatfile',
 						value: this.settings.getOpt('_TYPE_FLAT')
 					},
-					{
-						name: 'Wordpress',
-						value: this.settings.getOpt('_TYPE_WORDPRESS')
-					},
+
 					{
 						name: 'Email Template',
 						value: this.settings.getOpt('_TYPE_EMAIL')

@@ -1,45 +1,46 @@
 {
-  "name": "generator-response",
-  "version": "0.1.0",
-  "description": "Yeoman generator",
-  "license": "MIT",
-  "main": "app/index.js",
-  "repository": "drbroad/generator-response",
-  "homepage": "http://thepowertoprovoke.com",
-  "author": {
-	"name": "Marc Broad",
-	"email": "mbroad@thepowertoprovoke.com",
-	"url": "https://github.com/drbroad"
-  },
-  "engines": {
-	"node": ">=0.10.0"
-  },
-  "scripts": {
-	"test": "mocha"
-  },
-  "files": [
-	"app"
-  ],
-  "keywords": [
-	"yeoman-generator"
-  ],
-  "dependencies": {
-	"yeoman-generator": "~0.16.0",
-	"chalk": "~0.4.0",
-	"rimraf": "~2.1.4",
-	"underscore": "~1.5.1",
-	"underscore-contrib": "http://github.com/documentcloud/underscore-contrib/tarball/master",
-	"q": "~0.9.7",
-	"wrench": "~1.4.4",
-	"mysql": "~2.0.0-alpha7",
-	"simple-git": "~0.2.0",
-	"mkdirp": "~0.3.5",
-	"wp-util": "https://github.com/wesleytodd/wp-util/archive/master.zip"
-  },
-  "devDependencies": {
-	"mocha": "*"
-  },
-  "peerDependencies": {
-	"yo": ">=1.0.0"
-  }
+	"name": "generator-response",
+	"version": "0.1.0",
+	"description": "Yeoman generator",
+	"license": "MIT",
+	"main": "app/index.js",
+	"repository": "drbroad/generator-response",
+	"homepage": "http://thepowertoprovoke.com",
+	"author": {
+		"name": "Marc Broad",
+		"email": "mbroad@thepowertoprovoke.com",
+		"url": "https://github.com/drbroad"
+	},
+	"engines": {
+		"node": ">=0.10.0"
+	},
+	"scripts": {
+		"test": "mocha"
+	},
+	"files": [
+		"app"
+	],
+	"keywords": [
+		"yeoman-generator"
+	],
+	"dependencies": {
+		"yeoman-generator": "~0.16.0",
+		"shelljs": "~0.2.6",
+		"chalk": "~0.4.0",
+		"rimraf": "~2.1.4",
+		"underscore": "~1.5.1",
+		"underscore-contrib": "http://github.com/documentcloud/underscore-contrib/tarball/master",
+		"q": "~0.9.7",
+		"wrench": "~1.4.4",
+		"mysql": "~2.0.0-alpha7",
+		"simple-git": "~0.2.0",
+		"mkdirp": "~0.3.5",
+		"wp-util": "http://github.com/wesleytodd/wp-util/tarball/master"
+	},
+	"devDependencies": {
+		"mocha": "*"
+	},
+	"peerDependencies": {
+		"yo": ">=1.0.0"
+	}
 }

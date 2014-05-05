@@ -46,6 +46,12 @@ module.exports = function(advanced, defaults) {
 			validate: requiredValidate
 		},
 		{
+			name: "domainPrefix",
+			message: "What prefix do you use for your local sites? eg: dev.site.com",
+			default: "dev",
+			validate: requiredValidate
+		},		
+		{
 			type: 'list',
 			name: 'socketPath',
 			message: 'Choose your dev machine',

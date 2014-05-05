@@ -12,6 +12,7 @@ var Wordpress = require('../util/wordpress');
 var Logger = require('../util/logger');
 var spawn = require('child_process').spawn;
 var Settings = require('../util/constants');
+var shell = require('shelljs');
 
 var WordpressGenerator = yeoman.generators.Base.extend({
 
@@ -196,7 +197,7 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 
 	// Setup custom directory structure
 	somethingsDifferent: function() {
-console.log(this.settings.get());
+		console.log(this.settings.get());
 		if (this.settings.get('submodule') || this.settings.get('customDirs')) {
 
 			var me = this,
@@ -292,6 +293,7 @@ hazBaseData: function() {
 
 },
 
+
 // Set some permissions
 /* @TODO Thinking that maybe permissions should be left up to the user
    BUT, it seems that the theme stuff needs some permissions set to work....
@@ -350,19 +352,16 @@ commitThisToMemory: function() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+	/* MOVE THIS INTO WORDPRESS.JS!!!!! */
+	//Install Wordpress
+	InstallWordpress: function() {
+			if (this.settings.get('installTheme')) {
+				this.logger.log('Starting DB install');
+				Wordpress.installDB(this, this.settings.get(), this.async());
+				this.logger.verbose('DB install complete');
+			}
+	},
+	
 	// Install and activate the theme
 	dumbledoreHasStyle: function () {
 		if (this.settings.get('installTheme')) {
@@ -374,7 +373,7 @@ commitThisToMemory: function() {
 				/* @TODO You need to run the install before doing this
 				   see if I can get yeopress to do that.
 				*/
-				//wordpress.activateTheme(me.settings.get(), done);
+				Wordpress.activateTheme(me.settings.get(), done);
 				me.logger.verbose('Theme install complete');
 				done();
 			});
@@ -393,6 +392,8 @@ commitThisToMemory: function() {
 
 	},
 
+
+
 	// Save settings to .yeopress file
 	_saveDaSettings: function () {
 
@@ -400,6 +401,8 @@ commitThisToMemory: function() {
 		fs.writeFileSync('.yeopress', JSON.stringify(this.settings.get(), null, '\t'));
 
 	},
+
+
 
 	// All done
 	oopsIPeedMyself: function () {

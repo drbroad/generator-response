@@ -7,6 +7,7 @@ var mysql = require('mysql');
 var chalk = require('chalk');
 var exec = require('child_process').exec;
 var EventEmitter = require('events').EventEmitter;
+var spawn = require('child_process').spawn;
 var wordpressRepo = 'git://github.com/WordPress/WordPress.git';
 
 function getLanguage(contentDir, language, callback) {
@@ -176,6 +177,44 @@ function createDBifNotExists(db, callback) {
 	return ee;
 };
 
+
+/*
+install wordpress
+ */
+function installDB(generator, config, done){
+	var ee = new EventEmitter();
+
+    var query ='weblog_title=' + config.siteTitle + '&user_name=' + 'response'  + '&admin_password=' + 'response' + '&admin_password2=' + 'response' + '&admin_email=' + config.authorEmail + ' ';
+    var url = config.url + '/' + config.wpDir + '/wp-admin/install.php?step=2';
+    console.log('-d', query, url);
+	var curl = spawn('curl', ['-d', query, url]);
+
+	curl.stdout.on('data', function (data) {
+		console.log(chalk.green('curl: ') + (data.toString().replace(/\n/g, '')));
+	});
+
+	curl.stderr.on('data', function (data) {
+		console.log(chalk.red('DB error ') + data, true);
+		// curl doesn't exist
+	});
+
+	curl.stderr.on('close', function (code) {
+		if (!code) {
+			console.log(chalk.green('DB installed '));
+			ee.emit('done');
+		} else {
+			console.log(chalk.red('DB error ') + code);
+		}
+	});
+
+
+	if (typeof done === 'function') {
+		ee.on('done', done);
+	}
+
+	return ee;
+};
+
 function getContentDir() {
 	var ee = new EventEmitter();
 
@@ -315,6 +354,7 @@ module.exports = {
 	loadConfig : loadConfig,
 	getContentDir : getContentDir,
 	installTheme : installTheme,
+	installDB : installDB,
 	setupTheme : setupTheme,
 	activateTheme : activateTheme,
 	downloadLanguageFile: downloadLanguageFile,
