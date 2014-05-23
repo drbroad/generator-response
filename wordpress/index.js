@@ -5,6 +5,8 @@ var yeoman = require('yeoman-generator');
 var shell = require('shelljs');
 var Logger = require('../util/logger');
 var Settings = require('../util/constants');
+var Wordpress = require('../util/wordpress');
+var wp = require('wp-util');
 var art = require('../util/art');
 
 var WordpressGenerator = yeoman.generators.Base.extend({
@@ -64,6 +66,33 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 		setOpts();
 	},
 
+	setHost: function(){
+		var done = this.async();
+		var me = this;
+
+		me.logger.warn("Before you go on, please make sure you have set up your vhost!");
+		me.logger.alert("We will be trying to access: " + me.input.url);
+		me.logger.alert("If this isn't set up, the install WILL Fail...");
+
+
+		var checkHost = function () {
+				me.prompt([{
+					message: 'Have you set up your host?',
+					name: 'confirm',
+					type: 'confirm'
+				}], function (i) {
+					if (i.confirm) {
+						done();
+					} else {
+						checkHost();
+					}
+				});
+		};
+
+		checkHost();
+
+	},
+
 	storeOpts: function () {
 		var me = this;
 		var done = this.async();
@@ -93,8 +122,8 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 		me.logger.verbose('User Input: ' + JSON.stringify(me.settings.get(), null, '  '));
 		//me.logger.log(art.go, {logPrefix: ''});
 
-		//this._countdown(done);
-		done();
+		this._countdown(done);
+		//done();
 	},
 
 	_countdown : function (callback) {
@@ -179,11 +208,41 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 			me.logger.warn('Copying index.php');
 			me.template('index.php.tmpl', 'index.php');
 			me.template('composer.json.tmpl', 'composer.json');
-			shell.mkdir(me.settings.get('contentDir'));
-			me.directory(me.settings.get('wpDir') + '/wp-content', me.settings.get('contentDir'));
-			shell.rm('-r', './' + me.settings.get('wpDir') + '/wp-content');
+			shell.mv('./' + me.settings.get('wpDir') + '/wp-content', './');
+			shell.mv('./wp-content', me.settings.get('contentDir') ) 
 			done();			
-		}	
+		}
+	},
+
+	// wp-config.php
+	muHaHaHaConfig: function() {
+
+		var me = this,
+			done = this.async();
+
+		this.logger.log('Getting salt keys');
+		wp.misc.getSaltKeys(function(err, saltKeys) {
+			if (err) {
+				me.logger.error('Failed to get salt keys, remember to change them.');
+			}
+			me.logger.verbose('Salt keys: ' + JSON.stringify(saltKeys, null, '  '));
+			me.settings.set('saltKeys', saltKeys);
+			me.logger.verbose('Copying wp-config');
+			me.template('wp-config.php.tmpl', 'wp-config.php');
+			done();
+		});
+
+	},
+
+	/*
+	install wordpress
+	 */
+	installDB : function(){
+		if (this.settings.get('installTheme')) {
+			this.logger.log('Starting DB install');
+			Wordpress.installDB(this, this.settings.get(), this.async());
+			this.logger.verbose('DB install complete');
+		}
 	}
 
 });

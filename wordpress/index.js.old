@@ -10,7 +10,7 @@ var git= require('simple-git')();
 var wrench  = require('wrench');
 var Wordpress = require('../util/wordpress');
 var Logger = require('../util/logger');
-var spawn = require('child_process').spawn;
+var spawn = require('child_process').spawn
 var Settings = require('../util/constants');
 var shell = require('shelljs');
 
