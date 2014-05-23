@@ -167,6 +167,14 @@ module.exports = function(advanced, defaults) {
 				return !!res.installTheme;
 			}
 		}, {
+			message: 'Theme Name',
+			name: 'themeName',
+			default: defaults.appName,
+			validate: requiredValidate,
+			when: function (res) {
+				return !!res.installTheme;
+			}
+		}, {			
 			message: 'GitHub username',
 			name: 'themeUser',
 			default: defaults.themeUser || 'roots',

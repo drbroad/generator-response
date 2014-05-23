@@ -1,4 +1,4 @@
-//'use strict';
+'use strict';
 var util = require('util');
 var path = require('path');
 var yeoman = require('yeoman-generator');
@@ -11,7 +11,7 @@ var art = require('../util/art');
 
 var WordpressGenerator = yeoman.generators.Base.extend({
 
-	init: function(args, options){
+	init: function (args , options) {
 
 		// Setup the logger
 		this.logger = new Logger({
@@ -20,11 +20,11 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 
 		// Setup the Global settings
 		this.settings = Settings.getInstance();
-
 		this.pkg = yeoman.file.readJSON(path.join(__dirname, '../package.json'));
-
 		this.on('end', function () {
-
+			// do stuff here...
+			// delete output .txt
+			// composer and bower installs
 		});
 
 	},
@@ -74,12 +74,12 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 		me.logger.alert("We will be trying to access: " + me.input.url);
 		me.logger.alert("If this isn't set up, the install WILL Fail...");
 
-
 		var checkHost = function () {
 				me.prompt([{
-					message: 'Have you set up your host?',
-					name: 'confirm',
-					type: 'confirm'
+					message	: 'Have you set up your host?',
+					name 	: 'confirm',
+					type 	: 'confirm'
+
 				}], function (i) {
 					if (i.confirm) {
 						done();
@@ -159,40 +159,46 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 		var done = this.async();
 		var me = this;
 
-		me.logger.log('\n*************************************************\n** Downloading the latest Version of Wordpress **\n*************************************************');
-		//me.tarball('http://wordpress.org/latest.zip', './', done);
+		Wordpress.getCurrentVersion( function (err, version){
+			me.logger.log('Downloading the latest Version of Wordpress');
+			me.remote('wordpress', 'wordpress', version, function(err, remote) {
+				remote.bulkDirectory('.', me.settings.get('wpDir'));
+				me.logger.log('WordPress installed');
+				done();
+			});
+		});
 
-		me.remote('wordpress', 'wordpress', 'master', function(err, remote) {
-			remote.bulkDirectory('.', me.settings.get('wpDir'));
-			me.logger.log('WordPress installed');
-			done();
-		});		
+
 	},
 
 	removeThemes: function () {
 		var me = this;
-	    me.logger.log('\n*******************************************\n** Deleting the default Wordpress themes **\n*******************************************');
-	    shell.rm('-rf', './' + me.settings.get('wpDir') + '/wp-content/themes/*');
-	},	
+		if  (me.settings.get('installTheme')) {
+			me.logger.log('Deleting the default Wordpress themes');
+			shell.rm('-rf', './' + me.settings.get('wpDir') + '/wp-content/themes/*');
+		}
+	},
 
 	customTheme: function () {
 		var done = this.async();
 		var me = this;
 
-	    if( me.settings.get('installTheme') ){
+		if ( me.settings.get('installTheme') ){
 
-	        me.logger.log('\n*********************************************************************\n** Downloading and installing your theme **\n********************************************************************');
-	        // me.tarball("https://github.com/" + me.settings.get('themeUser') + "/" + me.settings.get('themeRepo') + "/tarball/master", 'wp-content/themes/' + me.settings.get('themeDir'), done);
+			me.logger.log('Downloading and installing your theme');
+			// me.tarball("https://github.com/" + me.settings.get('themeUser') + "/" + me.settings.get('themeRepo') + "/tarball/master", 'wp-content/themes/' + me.settings.get('themeDir'), done);
 
 			me.remote(me.settings.get('themeUser'), me.settings.get('themeRepo'), 'master', function(err, remote) {
 				remote.bulkDirectory('.', me.settings.get('wpDir') + '/wp-content/themes/' + me.settings.get('themeDir'));
 				me.logger.log('Theme installed');
 				done();
-			});		        
-	    }else{
-	        me.logger.log('\n*********************************************************************\n** Downloading and installing your theme **\n********************************************************************');
-	        me.tarball('https://wordpress.org/themes/download/twentyfourteen.1.0.zip', 'wp-content/themes/' + me.settings.get('themeDir'), done);
-	    }
+			});	
+
+		}else{
+			// me.logger.log('\n*********************************************************************\n** Downloading and installing your theme **\n********************************************************************');
+			// me.tarball('https://wordpress.org/themes/download/twentyfourteen.1.0.zip', 'wp-content/themes/' + me.settings.get('themeDir'), done);
+			done();
+		}
 
 	},
 
@@ -234,16 +240,59 @@ var WordpressGenerator = yeoman.generators.Base.extend({
 
 	},
 
-	/*
-	install wordpress
-	 */
-	installDB : function(){
-		if (this.settings.get('installTheme')) {
-			this.logger.log('Starting DB install');
-			Wordpress.installDB(this, this.settings.get(), this.async());
-			this.logger.verbose('DB install complete');
-		}
+	// Check that the database exists, create it otherwise
+	hazBaseData: function() {
+
+		var done = this.async(),
+			me = this;
+
+		//this.wpSite.database.createIfNotExists(function(err) {
+		Wordpress.createDBifNotExists(this.settings.get(), function(err) {
+			if (err) {
+				me.logger.warn('Cannot access database');
+				me.logger.warn('Make sure you create the database and update the credentials in the wp-config.php');
+			}
+			done();
+		});
+
+	},
+
+	//move css template and update theme name
+	moveCss: function () {
+		var me = this;
+	    me.logger.alert('Adding theme name to style.cs');
+	    shell.exec("sed -i -e 's/.*Theme Name.*/Theme Name: " + me.settings.get('themeName') + "/' ./" + me.settings.get('contentDir') + "/themes/" + me.settings.get('themeDir') + "/style.css")
+	    shell.exec("rm -f -r ./" + me.settings.get('contentDir') + "/themes/" + me.settings.get('themeDir') + "/style.css-e")
+	},
+
+
+	//Install Wordpress
+	InstallWordpress: function () {
+		var done = this.async();
+		var me = this;
+	   	me.logger.alert('Installing Wordpress');
+		Wordpress.installDB(me, me.settings.get(), done);
+		this.logger.verbose('DB install complete');
+	},
+
+	// Install and activate the theme
+	dumbledoreHasStyle: function () {
+
+		var me = this;
+		var done = this.async();
+		Wordpress.activateTheme(me.settings.get(), done);
+
+	},
+
+	// Setup theme
+	dummyYouHaveToPlugItInFirst: function () {
+
+			this.logger.log('Starting theme setup');
+			Wordpress.setupTheme(this, this.settings.get(), this.async());
+			this.logger.verbose('Theme setup complete');
+
 	}
+
 
 });
 

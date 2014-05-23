@@ -91,7 +91,7 @@ function getSaltKeys(callback) {
 };
 
 function getCurrentVersion(callback) {
-	var latestVersion = '3.8';
+	var latestVersion = '3.9';
 	require('simple-git')().listRemote('--tags '+ wordpressRepo, function(err, tagsList) {
 		if (err) return callback(err, latestVersion);
 		tagList = ('' + tagsList).split('\n');
@@ -183,11 +183,9 @@ install wordpress
  */
 function installDB(generator, config, done){
 	var ee = new EventEmitter();
-
     var query ='weblog_title=' + config.siteTitle + '&user_name=' + 'response'  + '&admin_password=' + 'response' + '&admin_password2=' + 'response' + '&admin_email=' + config.authorEmail + ' ';
     var url = config.url + '/' + config.wpDir + '/wp-admin/install.php?step=2';
-    console.log('-d', query, url);
-	var curl = spawn('curl', ['-d', query, url]);
+	var curl = spawn('curl', ['-d', query, '-s', '-o', 'output.txt', url]);
 
 	curl.stdout.on('data', function (data) {
 		console.log(chalk.green('curl: ') + (data.toString().replace(/\n/g, '')));
@@ -206,7 +204,6 @@ function installDB(generator, config, done){
 			console.log(chalk.red('DB error ') + code);
 		}
 	});
-
 
 	if (typeof done === 'function') {
 		ee.on('done', done);
@@ -305,24 +302,24 @@ function setupTheme(generator, config, done) {
 
 };
 
-function activateTheme(themeName, callback) {
+function activateTheme(db, callback) {
 	var ee = new EventEmitter();
 
-	getDbCredentials().on('done', function(db) {
-
 		var connection = mysql.createConnection({
-			host     : db.host,
-			user     : db.user,
-			password : db.pass,
-			database : db.name
+			host     : db.dbHhost,
+			user     : db.dbUser,
+			password : db.dbPass,
+			database : db.dbName,
+			socketPath: db.socketPath
 		});
+
 
 		connection.connect(function(err) {
 			if (err) return ee.emit('error', err);
 
 			var q = [
-				"UPDATE " + db.prefix + "options",
-				"SET option_value =  "+ mysql.escape(themeName),
+				"UPDATE " + db.tablePrefix + "options",
+				"SET option_value =  "+ mysql.escape(db.themeDir),
 				"WHERE option_name = 'template'",
 				"OR option_name = 'stylesheet'"
 			].join('\n');
@@ -335,8 +332,6 @@ function activateTheme(themeName, callback) {
 			});
 
 		});
-
-	});
 
 	if (typeof callback === 'function') {
 		ee.on('done', callback);
