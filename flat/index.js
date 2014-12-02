@@ -7,6 +7,7 @@ var prompts = require('../util/prompts');
 var Logger = require('../util/logger');
 var Config = require('../util/config');
 var Settings = require('../util/constants');
+var art = require('../util/art');
 
 var FlatfileGenerator = yeoman.generators.Base.extend({
 	init: function () {
@@ -49,65 +50,42 @@ var FlatfileGenerator = yeoman.generators.Base.extend({
 		me.prompt(prompts(me.options.advanced, me.conf.get()), function (inputs) {
 			var type = this.env.options.generatorType;
 			this.env.options[type] = inputs;
+			me.settings.set(inputs);
 			done();
 		}.bind(this));
 
 	},
 
-	myOptions: function () {
-		var done = this.async();
-		console.log(this.commonOpts);
-		console.log(this.env.options);
-	},
-
 	askFor: function () {
 		var done = this.async();
-		console.log(chalk.magenta('Response:  Create a flatfile website.'));
+		var me = this;
 
-		var prompts = [
-			{
-				name: "jobName",
-				message: "What would you like to call this project?",
-			},
-			{
-				name: "author",
-				message: "What is the authors (your) name?",
-				default: "Marc Broad"
-			},
-			{
-				name: "authorEmail",
-				message: "What is your email?",
-				default: "mbroad@thepowertoprovoke.com"
-			},
-			{
-				type: "confirm",
-				name: "IE8",
-				message: "Do you need IE8 support (jquery 1.9, respond.js) ?",
-				default: false
-			},
-			{
-				name: "bowerDir",
-				message: "What directory would you like bower to install components to?",
-				default: "vendor"
-			},
-		];
+		var setOpts = function () {
+			me.prompt(require('./prompts')(me.options.advanced, me.settings.get()), function (input) {
+				me.prompt([{
+					message: 'Does this all look correct?',
+					name: 'confirm',
+					type: 'confirm'
+				}], function (i) {
+					if (i.confirm) {
+						me.settings.set(input);					
+						me.input = input;
+						done();
+					} else {
+						console.log();
+						setOpts();
+					}
+				});
+			});
+		};
 
-		this.prompt(prompts, function (props) {
-			this.jobName = props.jobName;
-			this.author = props.author;
-			this.authorEmail = props.authorEmail;
-			this.jqueryVersion = "~2.1.0";
-			this.bowerDir = props.bowerDir;
-			this.IE8 = props.IE8;
+		setOpts();
+	},
 
-			if (props.IE8){
-				this.jqueryVersion = "1.9.0";
-			}
-
-			me.logger.log(art.go, {logPrefix: ''});
-			this._countdown(done);
-
-		}.bind(this));
+	countdownEnginesOn: function () {
+		var done = this.async();
+		var me = this;		
+		this._countdown(done);
 	},
 
 	_countdown : function (callback) {

@@ -10,6 +10,15 @@ module.exports = function(advanced, defaults) {
 		return true;
 	};
 
+	var alphaValidate = function (value) {
+		var regexp = /^[a-zA-Z0-9-_\s]+$/;
+		if (value.search(regexp) == -1){ 
+			return 'Only A-Z 0-9 plus dashes and underscores allowed.'; 
+		}
+
+		return true;
+	}
+
 	// When advanced
 	var advancedWhen = function () {
 		return advanced;
@@ -17,18 +26,14 @@ module.exports = function(advanced, defaults) {
 
 	return [
 		{
-			name: "jobName",
-			message: "What would you like to call this project?",
-		},
-		{
 			name: "author",
 			message: "What is the authors (your) name?",
-			default: "Marc Broad"
+			default: defaults.author || 'Marc Broad'
 		},
 		{
 			name: "authorEmail",
 			message: "What is your email?",
-			default: "mbroad@thepowertoprovoke.com"
+			default: defaults.authorEmail || 'mbroad@thepowertoprovoke.com'
 		},
 		{
 			type: "confirm",

@@ -1,13 +1,13 @@
 {
-	"name": "<%= _.slugify(jobName) %>",
+	"name": "<%= settings.get("appName") %>",
 	"private": true,
-	"author": "<%= author %> <<%= authorEmail %>>",
+	"author": "<%= settings.get("author") %> <<%= settings.get('authorEmail') %>>",
 	"version": "0.1.0",
 	"dependencies": {
-		"jquery" 	: 	"<%= jqueryVersion %>",
+		"jquery" 	: 	"<%= settings.get("jqueryVersion") %>",
 		"bootstrap"	:	 "~3.0.3",
 		"modernizr" 	:	 "",
-	<% if ( IE8 ){ %>
+	<% if ( settings.get("IE8") ){ %>
 		"respond"	:	 "~1.4.2",
 	<% } %>
 		"Font-Awesome": 	""

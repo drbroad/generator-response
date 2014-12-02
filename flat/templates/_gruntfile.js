@@ -9,7 +9,7 @@ module.exports = function(grunt) {
 			},
 			all: [
 				'Gruntfile.js',
-				'./www/js/pages/*.js',
+				'./www/assets/js/*.js',
 			]
 		},
 		less: {
@@ -34,21 +34,21 @@ module.exports = function(grunt) {
 				files: {
 					// COMPONENTS
 					'www/assets/js/components.min.js': [
-						'<%= bowerDir %>/jquery/jquery.js',
-						<% if ( IE8 ){ %>
-						'<%= bowerDir %>/respond/src/respond.js',
+						'<% settings.get("bowerDir") %>/jquery/jquery.js',
+						<% if ( settings.get("IE8") ){ %>
+						'<% settings.get("bowerDir") %>/respond/src/respond.js',
 						<% } %>
-						'<%= bowerDir %>/bootstrap/js/transition.js',
-						'<%= bowerDir %>/bootstrap/js/alert.js',
-						'<%= bowerDir %>/bootstrap/js/button.js',
-						'<%= bowerDir %>/bootstrap/js/carousel.js',
-						'<%= bowerDir %>/bootstrap/js/collapse.js',
-						'<%= bowerDir %>/bootstrap/js/dropdown.js',
-						'<%= bowerDir %>/bootstrap/js/modal.js',
-						'<%= bowerDir %>/bootstrap/js/tooltip.js',                
-						'<%= bowerDir %>/bootstrap/js/scrollspy.js',
-						'<%= bowerDir %>/bootstrap/js/tab.js',
-						'<%= bowerDir %>/bootstrap/js/affix.js',
+						'<% settings.get("bowerDir") %>/bootstrap/js/transition.js',
+						'<% settings.get("bowerDir") %>/bootstrap/js/alert.js',
+						'<% settings.get("bowerDir") %>/bootstrap/js/button.js',
+						'<% settings.get("bowerDir") %>/bootstrap/js/carousel.js',
+						'<% settings.get("bowerDir") %>/bootstrap/js/collapse.js',
+						'<% settings.get("bowerDir") %>/bootstrap/js/dropdown.js',
+						'<% settings.get("bowerDir") %>/bootstrap/js/modal.js',
+						'<% settings.get("bowerDir") %>/bootstrap/js/tooltip.js',                
+						'<% settings.get("bowerDir") %>/bootstrap/js/scrollspy.js',
+						'<% settings.get("bowerDir") %>/bootstrap/js/tab.js',
+						'<% settings.get("bowerDir") %>/bootstrap/js/affix.js',
 					],
 					// MAIN SCRIPTS...
 					'www/assets/js/main.min.js': [

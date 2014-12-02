@@ -1,7 +1,7 @@
 {
-	"name": "<%= _.slugify(jobName) %>",
+	"name": "<%= _.slugify(settings.get("appName")) %>",
 	"private": true,
-	"author": "<%= author %> <<%= authorEmail %>>",
+	"author": "<%= settings.get("author") %> <<%= settings.get("authorEmail") %>>",
 	"version": "0.1.0",
 	"homepage": "http://roots.io",
 	"repository": {

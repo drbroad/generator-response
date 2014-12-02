@@ -1,6 +1,6 @@
 Response: Flatfile Site
 =========
-# <%= jobName %>
+# <% settings.get('appName') %>
 
 Dillinger is a cloud-enabled HTML5 Markdown editor.
 
